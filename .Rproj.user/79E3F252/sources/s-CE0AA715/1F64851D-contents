@@ -1,0 +1,26 @@
+rm(list = ls())
+library(tidyverse)
+
+latam <- c("Argentina", "Bolivia", "Brazil", "Chile", "Colombia", "Costa Rica", "Cuba", "Dominican Republic", "Ecuador", "El Salvador", "Guatemala", "Honduras", "Mexico", "Nicaragua", "Panama", "Paraguay", "Peru", "Uruguay", "Venezuela")
+
+vacc_acum_evol <- read.csv("https://covid.ourworldindata.org/data/owid-covid-data.csv") %>%
+  filter(date>"2020-12-31") %>%
+  select(date,continent,iso_code,location,total_vaccinations_per_hundred) %>%
+  filter(location %in% latam) %>%
+  mutate(pais=case_when(
+    location=="Brazil" ~ "Brasil",
+    location=="Dominican Republic" ~ "Rep. D",
+    location=="Mexico" ~ "México",
+    location=="Peru" ~ "Perú",
+    TRUE ~ location
+  )) %>%
+  select(date,pais,total_vaccinations_per_hundred) %>%
+  pivot_wider(names_from=pais, values_from=total_vaccinations_per_hundred)
+
+write_csv2(vacc_acum_evol,"vacc_acum_evol.csv")
+
+git_add('vacc_acum_evol.csv')
+git_commit("Updating .csv for today", author = "Jorge Galindo <jorgegalindoalfonso@gmail.com>")
+git_log(max = 10)
+
+
